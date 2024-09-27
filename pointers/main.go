@@ -34,4 +34,10 @@ func main() {
 
 	fmt.Println("Value of arr: ", arr)
 	fmt.Println(" Len  of arr: ", len(arr))
+
+	//slices on go
+	var slice = []int{}
+	slice = append(slice, 1)
+
+	fmt.Println("Value of slice: ", slice)
 }
