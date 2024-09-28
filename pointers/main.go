@@ -2,27 +2,41 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
-	"net/http"
+	"net/url"
 )
 
-const url = "https://httpbin.org/get"
+const myurl = "https://httpbin.org:3000/get?course=go&jedi=master"
 
 func main() {
 	fmt.Println("Init function")
 
-	res, err := http.Get(url)
+	fmt.Println(myurl)
+	res, _ := url.Parse(myurl)
 
-	errs(err)
+	fmt.Println(res.Scheme)
+	fmt.Println(res.Host)
+	fmt.Println(res.Path)
+	fmt.Println(res.Port())
+	fmt.Println(res.RawQuery)
 
-	fmt.Printf("Responce is of type :%T\n", res)
-	defer res.Body.Close()
+	qparams := res.Query()
+	fmt.Println(qparams["course"])
+	fmt.Println(qparams["jedi"])
 
-	databytes, err := ioutil.ReadAll(res.Body)
-	errs(err)
+	for _, val := range qparams {
+		fmt.Println("Params are", val)
+	}
 
-	content := string(databytes)
-	fmt.Print(content)
+	partsOfurl := &url.URL{
+		Scheme:   "https",
+		Host:     "httpbin.org",
+		Path:     "/get",
+		RawQuery: "course=go&jedi=master",
+	}
+
+	aUrl := partsOfurl.String()
+
+	fmt.Println(aUrl)
 
 }
 
