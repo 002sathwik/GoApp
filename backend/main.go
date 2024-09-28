@@ -1,66 +1,30 @@
 package main
 
 import (
-	"databse/sql"
-	"log"
+	"fmt"
+	"io/ioutil"
 	"net/http"
-	"os"
-
-	"github.com/gorilla/mux"
-	_ "github.com/lib/pq"
 )
 
-type User struct {
-	Id    int    `json:"id"`
-	Name  string `json:"name"`
-	Email int    `json:"email"`
-}
-
 func main() {
-	db, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
-	_, err = db.Exec("CREATE TABLE IF NOT EXISTS users(id SERIAL PRIMARY KEY, name TEXT, email TEXT)")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	router := mux.NewRouter()
-	router.HandleFunc("/api/go/users", getUsers(db)).Methods("GET")
-	router.HandleFunc("/api/go/users", createUser(db)).Methods("POST")
-	router.HandleFunc("/api/go/users/{id}", getUser(db)).Methods("GET")
-	router.HandleFunc("/api/go/users/{id}", updateUser(db)).Methods("PUT")
-	router.HandleFunc("/api/go/users/{id}", deleteUser(db)).Methods("DELETE")
-
-	enhancedRouter := enableCROS(jsonContentTypeMiddleware(router))
-
-	log.Fatal(http.ListenAndServe(":8000", enhancedRouter))
-
+	fmt.Println("Init function")
+	PerformGetRequest()
 }
 
-func enableCROS(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func PerformGetRequest() {
+	const myurl = "http://localhost:3000/get"
 
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+	res, err := http.Get(myurl)
+	if err != nil {
+		panic(err)
+	}
 
-		if r.Method == "OPTIONS" {
-			w.WriteHeader(http.StatusOK)
-			return
-		}
+	defer res.Body.Close()
 
-		next.ServeHTTP(w, r)
+	fmt.Println("Response status:", res.StatusCode)
+	fmt.Println("Content Length:", res.ContentLength)
+	con, _ := ioutil.ReadAll(res.Body)
 
-	})
-}
-func jsonContentTypeMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		next.ServeHTTP(w, r)
+	fmt.Println(string(con))
 
-	})
 }
