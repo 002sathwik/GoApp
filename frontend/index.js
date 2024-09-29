@@ -13,8 +13,8 @@ app.post("/post", (req, res) => {
   let myJson = req.body;
   res.status(200).send(myJson);
 });
-app.post("/postfprm ", (req, res) => {
-  res.status(200).send(Json.stringify(req.body));
+app.post("/postform", (req, res) => {
+  res.status(200).send(JSON.stringify(req.body));
 });
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
